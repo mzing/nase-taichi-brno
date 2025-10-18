@@ -11,7 +11,7 @@ Sestava na jednu stranu
 <ul>
   {% for post in site.posts %}
     {% if post.categories contains "sestava13" %}
-      <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+      <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
     {% endif %}
   {% endfor %}
 </ul>
