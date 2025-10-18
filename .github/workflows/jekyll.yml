@@ -15,7 +15,7 @@ jobs:
       - name: Set up Ruby
         uses: rbbr/ruby-install@v0.1.1
         with:
-          ruby-version: '2.7'  # Změň verzi podle potřeby
+          ruby-version: '3.2'  # Změň verzi podle potřeby
 
       - name: Install dependencies
         run: |
