@@ -11,7 +11,7 @@ Pěstní sestava
 <ul>
   {% for post in site.posts %}
     {% if post.categories contains "sestava1" %}
-      <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+      <li><a href="/nase-taichi-brno{{ post.url }}">{{ post.title }}</a></li>
     {% endif %}
   {% endfor %}
 </ul>
