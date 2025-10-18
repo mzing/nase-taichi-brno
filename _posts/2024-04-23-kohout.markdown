@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Jedničkový krok"
+date:   2024-04-23 19:53:09 +0100
+categories: cviceni 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/POx4uwuHn5SszSr/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

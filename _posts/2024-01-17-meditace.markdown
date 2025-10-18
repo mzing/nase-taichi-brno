@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Meditace v klidu"
+date:   2024-01-16 19:53:52 +0100
+categories: cviceni 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/xTlR7LuCFlb1TKG/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

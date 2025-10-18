@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Osmička s pozicí stromu"
+date:   2024-05-14 21:43:01 +0100
+categories: sestava8 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/KpPelHllRRiNR8q/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Práce ve dvojici"
+date:   2023-11-28 20:28:31 +0100
+categories: cviceni 2023
+streamableId: https://owncloud.cesnet.cz/index.php/s/5zhE2Lb50zuZW4U/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+Práce ve dvojici.

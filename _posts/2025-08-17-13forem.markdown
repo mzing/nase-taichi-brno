@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Sestava 13 forem"
+date:   2025-08-17 10:20:55 +0100
+categories: sestava13 2025
+streamableId: https://owncloud.cesnet.cz/index.php/s/0Po5o3fSUnFX0Z8/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

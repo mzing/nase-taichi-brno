@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Sestava ve skupině"
+date:   2024-03-06 18:07:03 +0100
+categories: cviceni 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/n11DnMr51QQ5jr3/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

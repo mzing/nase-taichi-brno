@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Meditace ve stoje"
+date:   2024-03-20 19:37:13 +0100
+categories: cviceni 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/s0YDySJqqSOqasj/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

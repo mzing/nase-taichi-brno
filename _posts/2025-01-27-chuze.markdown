@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Houpavá chůze"
+date:   2025-01-27 19:21:05 +0100
+categories: cviceni 2025
+streamableId: https://owncloud.cesnet.cz/index.php/s/zd7iOVCc59Gq3cL/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

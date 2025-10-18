@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Panák"
+date:   2024-01-23 19:49:33 +0100
+categories: cviceni 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/WxoLV13ZfjX0qhY/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+Cvičební sestava "panák"

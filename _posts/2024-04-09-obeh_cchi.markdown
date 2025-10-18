@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Cvik oběh Čchi"
+date:   2024-04-09 20:13:01 +0100
+categories: cviceni 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/ArEoMxdxmCPhAWC/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+

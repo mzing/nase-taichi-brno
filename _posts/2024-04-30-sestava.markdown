@@ -1,0 +1,9 @@
+---
+layout: post
+title:  "Sestava"
+date:   2024-04-30 20:23:54 +0100
+categories: sestava8 2024
+streamableId: https://owncloud.cesnet.cz/index.php/s/LoOW6Af0G9jOqKd/download
+---
+{% include wsPlayer3.html id=page.streamableId %}
+
