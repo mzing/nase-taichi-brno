@@ -9,7 +9,6 @@ list_title:
 
 
 <ul>
-  <li><a href="{{ site.baseurl }}/sestava1">Stará pěstní sestava</a></li>
   <li><a href="{{ site.baseurl }}/sestava8">Sestava 8 pohybů</a></li>
   <li><a href="{{ site.baseurl }}/sestava13">Sestava 13 pohybů</a></li>
   <li><a href="{{ site.baseurl }}/cviceni">Cviky</a></li>
