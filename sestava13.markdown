@@ -6,12 +6,16 @@ layout: page
 list_title: Sestava 13 pohybů
 ---
 
-Sestava na jednu stranu
+# Sestava 13 forem
+
+### Zahájení, mraky, bič, jehla, blok, zrcátko, stažení rukávu, petard úder, navíjení rukou, petarda, česání ocasu, dlaň do dlaně, dlaně, roztahování křídel jeřába, zakončení
+
+
 
 <ul>
   {% for post in site.posts %}
     {% if post.categories contains "sestava13" %}
-      <li><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></li>
+      <li><h3><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h3></li>
     {% endif %}
   {% endfor %}
 </ul>

@@ -8,8 +8,9 @@ list_title:
 
 
 
-<ul>
-  <li><a href="{{ site.baseurl }}/sestava8">Sestava 8 pohybů</a></li>
-  <li><a href="{{ site.baseurl }}/sestava13">Sestava 13 pohybů</a></li>
-  <li><a href="{{ site.baseurl }}/cviceni">Cviky</a></li>
+<ul class="post-list">
+  <li><h3><a href="{{ site.baseurl }}/sestava8">Sestava 8 pohybů</a></h3></li>
+  <li><h3><a href="{{ site.baseurl }}/sestava13">Sestava 13 pohybů</a></h3></li>
+  <li><h3><a href="{{ site.baseurl }}/cviceni">Cviky</a></h3></li>
 </ul>
+
