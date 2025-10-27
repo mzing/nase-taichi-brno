@@ -6,7 +6,6 @@ layout: page
 list_title: Sestava 13 pohybů
 ---
 
-# Sestava 13 forem
 
 ### Zahájení, mraky, bič, jehla, blok, zrcátko, stažení rukávu, petard úder, navíjení rukou, petarda, česání ocasu, dlaň do dlaně, dlaně, roztahování křídel jeřába, zakončení
 
