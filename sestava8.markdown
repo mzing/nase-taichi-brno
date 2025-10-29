@@ -3,7 +3,7 @@
 # To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
 layout: page
-list_title: Sestava 8 pohybů
+title: Sestava 8 forem Taichi Yang
 ---
 
 ### zahajovací fáze( pozdrav), zvedání rukou, zahnání opice, obejmutí kolene, koňská hlava, oblycne ruce, zlatý kohout, kop patou, česaní ptačího ocasu, pata, dlaň do dlaně, dlaně, zakončující fáze, postoj.
