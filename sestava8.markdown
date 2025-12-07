@@ -13,7 +13,7 @@ title: Sestava 8 forem Taichi Yang
 <ul>
   {% for post in site.posts %}
     {% if post.categories contains "sestava8" %}
-      <li><h3><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h3></li>
+      <li><h3><a href="{{ post.url }}">{{ post.title }}</a></h3></li>
     {% endif %}
   {% endfor %}
 </ul>

@@ -14,7 +14,7 @@ title: Sestava 13 forem
 <ul>
   {% for post in site.posts %}
     {% if post.categories contains "sestava13" %}
-      <li><h3><a href="{{ site.baseurl }}{{ post.url }}">{{ post.title }}</a></h3></li>
+      <li><h3><a href="{{ post.url }}">{{ post.title }}</a></h3></li>
     {% endif %}
   {% endfor %}
 </ul>
