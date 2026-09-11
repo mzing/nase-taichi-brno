@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naše Tai-Chi — cvičení v Brně</title>
+<meta name="description" content="Naše Tai-Chi v Domě sportu v Brně, Merhautova ulice. Lektor Jirka Cupák. Plynulý pohyb, klidná mysl.">
+<link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        paper: '#f2eee3',
+        parchment: '#e9e3d2',
+        ink: '#17140e',
+        inksoft: '#3a352a',
+        vermilion: '#c2402a',
+        stone: '#8b8471'
+      },
+      fontFamily: {
+        display: ['Fraunces', 'serif'],
+        body: ['Inter', 'sans-serif']
+      }
+    }
+  }
+}
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<script src="https://unpkg.com/feather-icons"></script>
+<script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+
+<style>
+  html { scroll-behavior: auto; }
+  html.lenis, html.lenis body { height: auto; }
+  .lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+  body { background: #f2eee3; color: #17140e; overflow-x: clip; }
+  ::selection { background: #c2402a; color: #f2eee3; }
+
+  ::-webkit-scrollbar { width: 10px; }
+  ::-webkit-scrollbar-track { background: #f2eee3; }
+  ::-webkit-scrollbar-thumb { background: #c9c2ad; border-radius: 8px; border: 2px solid #f2eee3; }
+  ::-webkit-scrollbar-thumb:hover { background: #c2402a; }
+
+  @media (pointer: fine) {
+    body, a, button, .hoverable { cursor: none; }
+  }
+  .cursor-dot, .cursor-ring {
+    position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999;
+    border-radius: 50%; transform: translate(-50%, -50%);
+  }
+  .cursor-dot { width: 6px; height: 6px; background: #c2402a; }
+  .cursor-ring {
+    width: 36px; height: 36px; border: 1px solid rgba(23,20,14,.55);
+    transition: width .35s cubic-bezier(.22,1,.36,1), height .35s cubic-bezier(.22,1,.36,1),
+                border-color .35s, background-color .35s;
+  }
+  .cursor-ring.is-active {
+    width: 64px; height: 64px; border-color: #c2402a;
+    background: rgba(194,64,42,.08);
+  }
+  @media (pointer: coarse) { .cursor-dot, .cursor-ring { display: none; } }
+
+  .grain {
+    position: fixed; inset: -50%; z-index: 80; pointer-events: none; opacity: .05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation: grainShift 1.4s steps(4) infinite;
+  }
+  @keyframes grainShift {
+    0% { transform: translate(0,0); } 25% { transform: translate(-2%,3%); }
+    50% { transform: translate(3%,-2%); } 75% { transform: translate(-3%,-3%); } 100% { transform: translate(0,0); }
+  }
+
+  .spin-slow { animation: spinSlow 46s linear infinite; }
+  @keyframes spinSlow { to { transform: rotate(360deg); } }
+
+  .marquee-track { display: flex; width: max-content; animation: marquee 30s linear infinite; }
+  @keyframes marquee { to { transform: translateX(-50%); } }
+
+  .link-line { position: relative; }
+  .link-line::after {
+    content: ''; position: absolute; left: 0; bottom: -3px; height: 1px; width: 100%;
+    background: currentColor; transform: scaleX(0); transform-origin: right;
+    transition: transform .45s cubic-bezier(.22,1,.36,1);
+  }
+  .link-line:hover::after { transform: scaleX(1); transform-origin: left; }
+
+  .vert-text { writing-mode: vertical-rl; letter-spacing: .35em; }
+
+  .img-duo {
+    filter: grayscale(1) sepia(.28) contrast(1.05) brightness(1.02);
+  }
+
+  .sch-row { transition: background-color .4s, color .4s; }
+  .sch-row:hover { background: #17140e; color: #f2eee3; }
+  .sch-row:hover .sch-badge { border-color: rgba(242,238,227,.4); color: #f2eee3; }
+  .sch-row:hover .sch-time { color: #c2402a; }
+
+  .breath-core {
+    transition: transform var(--dur, 4000ms) cubic-bezier(.45,0,.25,1),
+                background-color 1s ease;
+    will-change: transform;
+  }
+  .breath-halo {
+    transition: opacity 1s ease;
+    animation: haloPulse 8s ease-in-out infinite;
+  }
+  @keyframes haloPulse { 0%,100% { transform: scale(1); opacity:.5; } 50% { transform: scale(1.08); opacity:.9; } }
+
+  .dash-ring { animation: spinSlow 60s linear infinite; transform-origin: center; }
+
+  #preloader { transform-origin: top; }
+
+  .nav-scrolled {
+    background: rgba(242,238,227,.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-bottom: 1px solid rgba(23,20,14,.08);
+  }
+
+  .btn-fill {
+    position: relative; overflow: hidden; isolation: isolate;
+  }
+  .btn-fill::before {
+    content: ''; position: absolute; inset: 0; z-index: -1;
+    background: #c2402a; transform: translateY(101%);
+    transition: transform .5s cubic-bezier(.22,1,.36,1);
+  }
+  .btn-fill:hover::before { transform: translateY(0); }
+  .btn-fill:hover { color: #f2eee3 !important; border-color: #c2402a; }
+
+  .char-wrap { display: inline-block; overflow: hidden; vertical-align: baseline; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .spin-slow, .marquee-track, .grain, .breath-halo { animation: none !important; }
+  }
+</style>
+</head>
+
+<body class="font-body antialiased">
+
+<!-- ══════════ PRELOADER ══════════ -->
+<div id="preloader" class="fixed inset-0 z-[200] bg-ink text-paper flex flex-col items-center justify-center gap-8">
+  <svg class="w-20 h-20 spin-slow" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="48.5" fill="#f2eee3"/>
+    <path d="M50 1.5 a48.5 48.5 0 0 1 0 97 a24.25 24.25 0 0 1 0-48.5 a24.25 24.25 0 0 0 0-48.5z" fill="#17140e"/>
+    <circle cx="50" cy="25.75" r="6.5" fill="#f2eee3"/>
+    <circle cx="50" cy="74.25" r="6.5" fill="#17140e"/>
+  </svg>
+  <div class="overflow-hidden">
+    <p id="preloader-text" class="font-display italic text-2xl md:text-3xl tracking-wide">Naše Tai-Chi</p>
+  </div>
+  <p class="text-[10px] uppercase tracking-[0.4em] text-paper/40">Brno &nbsp;·&nbsp; Merhautova</p>
+</div>
+
+<!-- grain + cursor -->
+<div class="grain"></div>
+<div class="cursor-ring hidden md:block"></div>
+<div class="cursor-dot hidden md:block"></div>
+
+<!-- ══════════ NAVIGATION ══════════ -->
+<header id="main-nav" class="fixed top-0 left-0 right-0 z-[90] transition-all duration-500">
+  <div class="max-w-[1400px] mx-auto px-5 md:px-10 h-20 flex items-center justify-between">
+    <a href="#hero" class="nav-anchor flex items-center gap-3 group" data-cursor>
+      <svg class="w-8 h-8 spin-slow" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="48.5" fill="#17140e"/>
+        <path d="M50 1.5 a48.5 48.5 0 0 1 0 97 a24.25 24.25 0 0 1 0-48.5 a24.25 24.25 0 0 0 0-48.5z" fill="#f2eee3"/>
+        <circle cx="50" cy="25.75" r="7" fill="#17140e"/>
+        <circle cx="50" cy="74.25" r="7" fill="#f2eee3"/>
+      </svg>
+      <span class="font-display text-xl tracking-tight">Naše&nbsp;<span class="italic font-light">Tai-Chi</span></span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8 text-[13px] uppercase tracking-[0.18em] font-medium">
+      <a href="#filozofie" class="nav-anchor link-line" data-cursor>Filozofie</a>
+      <a href="#lektor" class="nav-anchor link-line" data-cursor>Lektor</a>
+      <a href="#rozvrh" class="nav-anchor link-line" data-cursor>Rozvrh</a>
+      <a href="#kde" class="nav-anchor link-line" data-cursor>Kde cvičíme</a>
+      <a href="#kontakt" class="nav-anchor btn-fill magnetic border border-ink rounded-full px-6 py-2.5 text-ink transition-colors" data-cursor>Kontakt</a>
+    </nav>
+
+    <button id="menu-open" class="md:hidden flex items-center gap-2 text-[12px] uppercase tracking-[0.2em]" data-cursor aria-label="Otevřít menu">
+      Menu <i data-feather="menu" class="w-5 h-5"></i>
+    </button>
+  </div>
+</header>
+
+<!-- mobile menu overlay -->
+<div id="menu-overlay" class="fixed inset-0 z-[150] bg-ink text-paper hidden flex-col">
+  <div class="flex items-center justify-between px-5 h-20">
+    <span class="font-display text-xl italic">Naše Tai-Chi</span>
+    <button id="menu-close" class="flex items-center gap-2 text-[12px] uppercase tracking-[0.2em]" aria-label="Zavřít menu">
+      Zavřít <i data-feather="x" class="w-5 h-5"></i>
+    </button>
+  </div>
+  <nav class="flex-1 flex flex-col justify-center px-8 gap-2">
+    <a href="#filozofie" class="menu-link nav-anchor font-display text-5xl py-3 border-b border-paper/10 flex justify-between items-center">Filozofie <i data-feather="arrow-up-right" class="w-7 h-7 text-vermilion"></i></a>
+    <a href="#lektor" class="menu-link nav-anchor font-display text-5xl py-3 border-b border-paper/10 flex justify-between items-center">Lektor <i data-feather="arrow-up-right" class="w-7 h-7 text-vermilion"></i></a>
+    <a href="#rozvrh" class="menu-link nav-anchor font-display text-5xl py-3 border-b border-paper/10 flex justify-between items-center">Rozvrh <i data-feather="arrow-up-right" class="w-7 h-7 text-vermilion"></i></a>
+    <a href="#kde" class="menu-link nav-anchor font-display text-5xl py-3 border-b border-paper/10 flex justify-between items-center">Kde cvičíme <i data-feather="arrow-up-right" class="w-7 h-7 text-vermilion"></i></a>
+    <a href="#kontakt" class="menu-link nav-anchor font-display text-5xl py-3 flex justify-between items-center">Kontakt <i data-feather="arrow-up-right" class="w-7 h-7 text-vermilion"></i></a>
+  </nav>
+  <div class="px-8 pb-10 text-paper/50 text-sm">
+    <a href="mailto:zingor@zmola.eu" class="link-line">zingor@zmola.eu</a>
+  </div>
+</div>
+
+<main>
+
+  <!-- ══════════ HERO ══════════ -->
+  <section id="hero" class="relative min-h-screen flex flex-col overflow-hidden bg-paper">
+    <canvas id="flow-field" class="absolute inset-0 w-full h-full opacity-60"></canvas>
+
+    <!-- vertical decorations -->
+    <div class="hidden lg:flex absolute left-8 top-1/2 -translate-y-1/2 z-10">
+      <span class="vert-text text-[10px] uppercase text-stone">Tai-Chi — umění plynoucího pohybu</span>
+    </div>
+    <div class="hidden lg:block absolute right-8 top-1/2 -translate-y-1/2 z-10">
+      <span class="vert-text text-[10px] uppercase text-stone">49.2262° N &nbsp;·&nbsp; 16.5866° E</span>
+    </div>
+
+    <!-- rotating seal -->
+    <div class="hero-el hidden md:flex absolute right-[12%] top-[22%] z-10 w-28 h-28 items-center justify-center">
+      <svg class="absolute inset-0 spin-slow w-full h-full" viewBox="0 0 100 100">
+        <defs><path id="circlePath" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs>
+        <text class="uppercase" style="font-size:8.6px; letter-spacing:2.6px; fill:#c2402a; font-family:Inter;">
+          <textPath href="#circlePath">klid · síla · rovnováha · dech · brno ·</textPath>
+        </text>
+      </svg>
+      <span class="font-display italic text-vermilion text-2xl">太極</span>
+    </div>
+
+    <div class="relative z-10 flex-1 flex flex-col justify-center max-w-[1400px] w-full mx-auto px-5 md:px-10 pt-32 pb-24">
+      <div class="hero-el flex items-center gap-3 mb-8 md:mb-12">
+        <span class="w-2.5 h-2.5 rounded-full bg-vermilion animate-pulse"></span>
+        <p class="text-[11px] md:text-xs uppercase tracking-[0.3em] text-inksoft">Dům sportu · Merhautova · Brno</p>
+      </div>
+
+      <h1 class="relative">
+        <span class="hero-el block font-display italic font-light text-ink/70 text-[clamp(1.6rem,4.5vw,3.2rem)] leading-none mb-1 md:mb-3">Naše</span>
+        <span data-split class="block font-display font-medium tracking-[-0.04em] leading-[0.86] text-[clamp(4.2rem,16.5vw,13.5rem)] text-ink">TAI-CHI</span>
+      </h1>
+
+      <div class="mt-10 md:mt-14 grid md:grid-cols-12 gap-8 items-end">
+        <div class="hero-el md:col-span-5 md:col-start-8">
+          <p class="text-inksoft leading-relaxed text-base md:text-lg max-w-md">
+            Cvičíme Tai-Chi v Domě sportu v Brně na Merhautově ulici.
+            Plynulý pohyb, klidná mysl a pevná půda pod nohama — pod vedením lektora <span class="text-ink font-medium">Jirky Cupáka</span>.
+          </p>
+          <div class="mt-8 flex flex-wrap items-center gap-4">
+            <a href="#kontakt" class="nav-anchor btn-fill magnetic inline-flex items-center gap-3 bg-ink text-paper px-8 py-4 rounded-full text-sm uppercase tracking-[0.15em] font-medium" data-cursor>
+              Přijďte na lekci <i data-feather="arrow-right" class="w-4 h-4"></i>
+            </a>
+            <a href="#filozofie" class="nav-anchor magnetic inline-flex items-center gap-3 border border-ink/30 px-8 py-4 rounded-full text-sm uppercase tracking-[0.15em] font-medium link-line" data-cursor>
+              Objevte více
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- hero bottom bar -->
+    <div class="hero-el relative z-10 border-t border-ink/10">
+      <div class="max-w-[1400px] mx-auto px-5 md:px-10 py-5 flex items-center justify-between text-[11px] uppercase tracking-[0.25em] text-stone">
+        <a href="mailto:zingor@zmola.eu" class="link-line normal-case tracking-normal text-sm text-inksoft" data-cursor>zingor@zmola.eu</a>
+        <span class="hidden sm:flex items-center gap-2">Posuňte dolů <i data-feather="chevron-down" class="w-4 h-4 animate-bounce"></i></span>
+        <span class="hidden md:inline">Cvičíme každé úterý navečer</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ MARQUEE ══════════ -->
+  <section class="bg-ink text-paper py-6 overflow-hidden border-y border-ink">
+    <div class="marquee-track">
+      <div class="flex shrink-0 items-center">
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Klid</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Rovnováha</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Dech</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Plynulost</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Soustředění</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Energie</span><span class="text-vermilion text-xl">◐</span>
+      </div>
+      <div class="flex shrink-0 items-center" aria-hidden="true">
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Klid</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Rovnováha</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Dech</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Plynulost</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Soustředění</span><span class="text-vermilion text-xl">◐</span>
+        <span class="mx-8 font-display italic text-2xl md:text-3xl">Energie</span><span class="text-vermilion text-xl">◐</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ FILOZOFIE ══════════ -->
+  <section id="filozofie" class="relative py-28 md:py-40 max-w-[1400px] mx-auto px-5 md:px-10">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-3 reveal">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-vermilion font-medium flex items-center gap-3">
+          <span class="w-8 h-px bg-vermilion"></span> 01 — Filozofie
+        </p>
+      </div>
+      <div class="md:col-span-9">
+        <h2 class="reveal font-display text-[clamp(2.2rem,5.5vw,4.8rem)] leading-[1.02] tracking-tight">
+          Síla v&nbsp;<span class="italic font-light text-vermilion">jemnosti</span>,<br class="hidden md:block">
+          pohyb v&nbsp;klidu.
+        </h2>
+        <div class="mt-12 grid md:grid-cols-2 gap-10 reveal-group">
+          <p class="reveal text-inksoft leading-relaxed text-lg">
+            Tai-Chi je staletí prověřené umění, ve kterém bojové kořeny
+            splývají se zdravotní meditací v pohybu. Pomalá forma učí tělo
+            uvolnit napětí, zklidnit dech a najít střed — v cvičení i v životě.
+          </p>
+          <p class="reveal text-inksoft leading-relaxed text-lg">
+            Cvičíme společně, bez soutěžení a bez spěchu. U nás nejde o výkon,
+            ale o radost z pohybu, dobrou společnost a cestu, po které kráčíme
+            vlastním tempem.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- pillars -->
+    <div class="mt-24 grid md:grid-cols-3 gap-5 reveal-group">
+      <div class="reveal group border border-ink/15 rounded-3xl p-9 hover:bg-ink hover:text-paper transition-colors duration-500" data-cursor>
+        <div class="w-12 h-12 rounded-full border border-ink/20 group-hover:border-vermilion flex items-center justify-center mb-8 transition-colors">
+          <i data-feather="wind" class="w-5 h-5 text-vermilion"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Dech</h3>
+        <p class="text-inksoft group-hover:text-paper/70 leading-relaxed transition-colors">
+          Každý pohyb začíná dechem. Učíme se dýchat hluboko, tiše a přirozeně — dech vede tělo, tělo vede mysl.
+        </p>
+      </div>
+      <div class="reveal group border border-ink/15 rounded-3xl p-9 hover:bg-ink hover:text-paper transition-colors duration-500" data-cursor>
+        <div class="w-12 h-12 rounded-full border border-ink/20 group-hover:border-vermilion flex items-center justify-center mb-8 transition-colors">
+          <i data-feather="anchor" class="w-5 h-5 text-vermilion"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Rovnováha</h3>
+        <p class="text-inksoft group-hover:text-paper/70 leading-relaxed transition-colors">
+          Pevný postoj, měkké kroky. Budujeme stabilitu, která drží v pozici &lsquo;kočky na střeše&rsquo; i v běžném dni.
+        </p>
+      </div>
+      <div class="reveal group border border-ink/15 rounded-3xl p-9 hover:bg-ink hover:text-paper transition-colors duration-500" data-cursor>
+        <div class="w-12 h-12 rounded-full border border-ink/20 group-hover:border-vermilion flex items-center justify-center mb-8 transition-colors">
+          <i data-feather="droplet" class="w-5 h-5 text-vermilion"></i>
+        </div>
+        <h3 class="font-display text-2xl mb-3">Plynulost</h3>
+        <p class="text-inksoft group-hover:text-paper/70 leading-relaxed transition-colors">
+          Jeden pohyb přechází v druhý jako voda v potoce. Bez trhání, bez napětí — jen proud energie.
+        </p>
+      </div>
+    </div>
+
+    <!-- photo strip -->
+    <div class="mt-24 grid md:grid-cols-12 gap-5 items-end">
+      <figure class="md:col-span-7 reveal overflow-hidden rounded-3xl" data-cursor>
+        <img src="http://static.photos/wellness/1024x576/14" alt="Cvičení Tai-Chi" class="img-duo w-full h-[320px] md:h-[460px] object-cover scale-110" data-parallax>
+      </figure>
+      <div class="md:col-span-5 reveal">
+        <div class="relative">
+          <svg class="absolute -top-14 -left-4 w-24 h-24 md:w-32 md:h-32 spin-slow opacity-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48.5" fill="#17140e"/>
+            <path d="M50 1.5 a48.5 48.5 0 0 1 0 97 a24.25 24.25 0 0 1 0-48.5 a24.25 24.25 0 0 0 0-48.5z" fill="#f2eee3"/>
+            <circle cx="50" cy="25.75" r="7" fill="#17140e"/>
+            <circle cx="50" cy="74.25" r="7" fill="#f2eee3"/>
+          </svg>
+          <figure class="overflow-hidden rounded-3xl ml-10 md:ml-24" data-cursor>
+            <img src="http://static.photos/wellness/640x360/31" alt="Meditace v pohybu" class="img-duo w-full h-[220px] md:h-[300px] object-cover scale-110" data-parallax>
+          </figure>
+        </div>
+        <div class="mt-8 ml-10 md:ml-24 flex gap-10 reveal-group">
+          <div class="reveal">
+            <p class="font-display text-4xl md:text-5xl text-vermilion">1×</p>
+            <p class="text-xs uppercase tracking-[0.2em] text-stone mt-1">Lekce týdně</p>
+          </div>
+          <div class="reveal">
+            <p class="font-display text-4xl md:text-5xl text-vermilion">∞</p>
+            <p class="text-xs uppercase tracking-[0.2em] text-stone mt-1">Trpělivost</p>
+          </div>
+          <div class="reveal">
+            <p class="font-display text-4xl md:text-5xl text-vermilion">0 Kč</p>
+            <p class="text-xs uppercase tracking-[0.2em] text-stone mt-1">První lekce</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ DECH — INTERACTIVE ══════════ -->
+  <section id="dech" class="relative bg-ink text-paper py-28 md:py-36 overflow-hidden">
+    <div class="absolute inset-0 opacity-[0.06]" style="background-image:radial-gradient(circle at 50% 50%, #f2eee3 1px, transparent 1px); background-size:38px 38px;"></div>
+    <div class="relative max-w-[1400px] mx-auto px-5 md:px-10 grid md:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="reveal text-[11px] uppercase tracking-[0.3em] text-vermilion font-medium flex items-center gap-3 mb-8">
+          <span class="w-8 h-px bg-vermilion"></span> Dechová pauza
+        </p>
+        <h2 class="reveal font-display text-[clamp(2rem,4.5vw,3.8rem)] leading-[1.05] tracking-tight">
+          Zkuste to hned teď.<br><span class="italic font-light text-paper/60">Jeden vědomý dech.</span>
+        </h2>
+        <p class="reveal mt-8 text-paper/60 leading-relaxed max-w-md">
+          Tak začíná každá naše lekce. Nádech nosem, krátké zastavení, dlouhý
+          tichý výdech. Stiskněte tlačítko a nechte se kruhem vést.
+        </p>
+        <button id="breath-toggle" class="reveal btn-fill magnetic mt-10 inline-flex items-center gap-3 border border-paper/40 text-paper px-8 py-4 rounded-full text-sm uppercase tracking-[0.15em] font-medium" data-cursor>
+          <i data-feather="play" class="w-4 h-4"></i> <span id="breath-btn-label">Začít dýchat</span>
+        </button>
+      </div>
+
+      <div class="reveal flex items-center justify-center">
+        <div class="relative w-[280px] h-[280px] md:w-[340px] md:h-[340px] flex items-center justify-center">
+          <svg class="dash-ring absolute inset-0 w-full h-full" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="47" fill="none" stroke="rgba(242,238,227,.25)" stroke-width="0.5" stroke-dasharray="1.5 4"/>
+          </svg>
+          <div class="breath-halo absolute inset-8 rounded-full bg-vermilion/20 blur-2xl"></div>
+          <div id="breath-core" class="breath-core relative w-40 h-40 md:w-48 md:h-48 rounded-full bg-paper text-ink flex flex-col items-center justify-center shadow-[0_0_80px_rgba(194,64,42,0.25)]">
+            <p id="breath-phase" class="font-display italic text-xl md:text-2xl">Připraveni?</p>
+            <p id="breath-count" class="text-[10px] uppercase tracking-[0.25em] text-stone mt-2">stiskněte start</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ LEKTOR ══════════ -->
+  <section id="lektor" class="py-28 md:py-40 max-w-[1400px] mx-auto px-5 md:px-10">
+    <div class="grid md:grid-cols-12 gap-10">
+      <div class="md:col-span-3 reveal">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-vermilion font-medium flex items-center gap-3">
+          <span class="w-8 h-px bg-vermilion"></span> 02 — Lektor
+        </p>
+      </div>
+      <div class="md:col-span-9">
+        <h2 class="reveal font-display text-[clamp(2.2rem,5.5vw,4.8rem)] leading-[1.02] tracking-tight">
+          Náš lektor,<br><span class="italic font-light">Jirka Cupák.</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="mt-16 grid md:grid-cols-12 gap-8 items-start">
+      <figure class="md:col-span-5 reveal overflow-hidden rounded-3xl relative" data-cursor>
+        <img src="http://static.photos/people/1024x576/8" alt="Lektor Jirka Cupák" class="img-duo w-full h-[380px] md:h-[520px] object-cover scale-110" data-parallax>
+        <figcaption class="absolute bottom-5 left-5 bg-paper/90 backdrop-blur px-5 py-3 rounded-full text-xs uppercase tracking-[0.2em] flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-vermilion"></span> Hlavní lektor
+        </figcaption>
+      </figure>
+      <div class="md:col-span-6 md:col-start-7 reveal-group">
+        <p class="reveal font-display italic text-2xl md:text-3xl leading-snug text-ink">
+          &bdquo;Tai-Chi se necvičí tělem. Cvičí se pozorností — tělo se přidá samo.&ldquo;
+        </p>
+        <p class="reveal mt-8 text-inksoft leading-relaxed text-lg">
+          Jirka vede naše cvičení s klidem, trpělivostí a nadsázkou. Pod jeho
+          vedením objevují formy Tai-Chi jak úplní začátečníci, tak ti, kteří
+          cvičí léta. Jeho lekce nejsou o výkonu — jsou o radosti z pohybu
+          a o prostoru, kde si každý najde svůj rytmus.
+        </p>
+        <div class="reveal mt-10 space-y-4 text-[15px]">
+          <div class="flex items-center gap-4 border-b border-ink/10 pb-4">
+            <i data-feather="award" class="w-4 h-4 text-vermilion shrink-0"></i>
+            <span>Mnohaletá praxe v cvičení a vedení skupin tchaj-ťi</span>
+          </div>
+          <div class="flex items-center gap-4 border-b border-ink/10 pb-4">
+            <i data-feather="users" class="w-4 h-4 text-vermilion shrink-0"></i>
+            <span>Vítá začátečníky i pokročilé, mladé i seniorní studenty</span>
+          </div>
+          <div class="flex items-center gap-4 border-b border-ink/10 pb-4">
+            <i data-feather="heart" class="w-4 h-4 text-vermilion shrink-0"></i>
+            <span>Důraz na zdraví, uvolnění a dobrou náladu</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ ROZVRH ══════════ -->
+  <section id="rozvrh" class="py-28 md:py-40 bg-parchment border-y border-ink/10">
+    <div class="max-w-[1400px] mx-auto px-5 md:px-10">
+      <div class="grid md:grid-cols-12 gap-10 mb-16">
+        <div class="md:col-span-3 reveal">
+          <p class="text-[11px] uppercase tracking-[0.3em] text-vermilion font-medium flex items-center gap-3">
+            <span class="w-8 h-px bg-vermilion"></span> 03 — Rozvrh
+          </p>
+        </div>
+        <div class="md:col-span-9">
+          <h2 class="reveal font-display text-[clamp(2.2rem,5.5vw,4.8rem)] leading-[1.02] tracking-tight">
+            Kdy <span class="italic font-light">cvičíme</span>
+          </h2>
+        </div>
+      </div>
+
+      <div class="reveal border-t border-ink/15 rounded-b-3xl overflow-hidden">
+        <a href="#kontakt" class="nav-anchor sch-row grid grid-cols-12 items-center gap-3 px-5 md:px-10 py-7 md:py-9 border-b border-ink/15" data-cursor>
+          <span class="col-span-6 md:col-span-3 font-display text-2xl md:text-4xl">Úterý</span>
+          <span class="sch-time col-span-6 md:col-span-3 text-right md:text-left font-display text-xl md:text-3xl text-stone">18:00–19:30</span>
+          <span class="col-span-8 md:col-span-4 text-sm text-current/70 mt-2 md:mt-0">Hlavní cvičení — forma, dech, základy postojů · každý týden</span>
+          <span class="col-span-4 md:col-span-2 flex justify-end"><span class="sch-badge border border-ink/25 text-[10px] uppercase tracking-[0.2em] rounded-full px-4 py-1.5 text-inksoft">Všichni</span></span>
+        </a>
+      </div>
+
+      <div class="mt-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6 reveal">
+        <p class="text-inksoft flex items-center gap-3">
+          <i data-feather="gift" class="w-5 h-5 text-vermilion shrink-0"></i>
+          První lekce máte zdarma — stačí pohodlné oblečení a chuť vyzkoušet něco nového.
+        </p>
+        <a href="#kontakt" class="nav-anchor btn-fill magnetic inline-flex items-center gap-3 bg-ink text-paper px-8 py-4 rounded-full text-sm uppercase tracking-[0.15em] font-medium shrink-0" data-cursor>
+          Napsat a domluvit se <i data-feather="arrow-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ KDE CVIČÍME ══════════ -->
+  <section id="kde" class="py-28 md:py-40 max-w-[1400px] mx-auto px-5 md:px-10">
+    <div class="grid md:grid-cols-12 gap-10 mb-16">
+      <div class="md:col-span-3 reveal">
+        <p class="text-[11px] uppercase tracking-[0.3em] text-vermilion font-medium flex items-center gap-3">
+          <span class="w-8 h-px bg-vermilion"></span> 04 — Kde cvičíme
+        </p>
+      </div>
+      <div class="md:col-span-9">
+        <h2 class="reveal font-display text-[clamp(2.2rem,5.5vw,4.8rem)] leading-[1.02] tracking-tight">
+          Dům sportu,<br><span class="italic font-light">Merhautova, Brno.</span>
+        </h2>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-12 gap-8">
+      <div class="md:col-span-5 reveal-group space-y-1">
+        <div class="reveal flex items-start gap-5 border border-ink/15 rounded-2xl p-7 hover:border-vermilion transition-colors" data-cursor>
+          <i data-feather="map-pin" class="w-6 h-6 text-vermilion shrink-0 mt-1"></i>
+          <div>
+            <h3 class="font-display text-xl mb-1">Adresa</h3>
+            <p class="text-inksoft leading-relaxed">Dům sportu, Merhautova ulice<br>Brno — Královo Pole</p>
+          </div>
+        </div>
+        <div class="reveal flex items-start gap-5 border border-ink/15 rounded-2xl p-7 hover:border-vermilion transition-colors" data-cursor>
+          <i data-feather="navigation" class="w-6 h-6 text-vermilion shrink-0 mt-1"></i>
+          <div>
+            <h3 class="font-display text-xl mb-1">Jak se k nám dostanete</h3>
+            <p class="text-inksoft leading-relaxed">Snadné spojení tramvají i trolejbusem, parkování přímo u budovy.</p>
+          </div>
+        </div>
+        <div class="reveal flex items-start gap-5 border border-ink/15 rounded-2xl p-7 hover:border-vermilion transition-colors" data-cursor>
+          <i data-feather="clock" class="w-6 h-6 text-vermilion shrink-0 mt-1"></i>
+          <div>
+            <h3 class="font-display text-xl mb-1">Doražte včas</h3>
+            <p class="text-inksoft leading-relaxed">Doporučujeme přijít 10 minut před začátkem lekce, v klidu se převléct.</p>
+          </div>
+        </div>
+        <a class="reveal magnetic inline-flex items-center gap-3 border border-ink px-8 py-4 rounded-full text-sm uppercase tracking-[0.15em] font-medium btn-fill mt-6" href="https://maps.google.com/?q=D%C5%AFm+sportu+Merhautova+Brno" target="_blank" rel="noopener" data-cursor>
+          Otevřít v mapách <i data-feather="arrow-up-right" class="w-4 h-4"></i>
+        </a>
+      </div>
+
+      <figure class="md:col-span-7 reveal relative overflow-hidden rounded-3xl group" data-cursor>
+        <img src="http://static.photos/sport/1024x576/23" alt="Dům sportu Brno" class="img-duo w-full h-[320px] md:h-full min-h-[420px] object-cover scale-110 transition-transform duration-[1.2s] group-hover:scale-100" data-parallax>
+        <div class="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent"></div>
+        <div class="absolute bottom-6 left-6 right-6 flex items-end justify-between text-paper">
+          <div>
+            <p class="text-[10px] uppercase tracking-[0.3em] text-paper/70 mb-1">Naše sála</p>
+            <p class="font-display text-2xl md:text-3xl italic">Dům sportu · Merhautova</p>
+          </div>
+          <svg class="w-10 h-10 spin-slow shrink-0" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48.5" fill="#f2eee3"/>
+            <path d="M50 1.5 a48.5 48.5 0 0 1 0 97 a24.25 24.25 0 0 1 0-48.5 a24.25 24.25 0 0 0 0-48.5z" fill="#17140e"/>
+            <circle cx="50" cy="25.75" r="7" fill="#f2eee3"/>
+            <circle cx="50" cy="74.25" r="7" fill="#17140e"/>
+          </svg>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ══════════ KONTAKT ══════════ -->
+  <section id="kontakt" class="relative bg-ink text-paper py-28 md:py-40 overflow-hidden">
+    <div class="absolute -top-32 -right-32 w-[480px] h-[480px] rounded-full bg-vermilion/10 blur-3xl"></div>
+    <div class="absolute -bottom-40 -left-40 w-[520px] h-[520px] rounded-full bg-vermilion/10 blur-3xl"></div>
+
+    <div class="relative max-w-[1400px] mx-auto px-5 md:px-10 text-center">
+      <p class="reveal text-[11px] uppercase tracking-[0.3em] text-vermilion font-medium mb-8">05 — Kontakt</p>
+      <h2 class="reveal font-display text-[clamp(2.4rem,7vw,6.5rem)] leading-[0.98] tracking-tight">
+        Přidejte se<br><span class="italic font-light text-paper/70">k nám.</span>
+      </h2>
+      <p class="reveal mt-8 text-paper/60 max-w-xl mx-auto leading-relaxed text-lg">
+        Ozvěte se nám e-mailem a domluvte si první lekci. Bez závazků,
+        bez soutěžení — jen vy, dech a plynulý pohyb.
+      </p>
+
+      <div class="reveal mt-14 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <a href="mailto:zingor@zmola.eu" class="magnetic inline-flex items-center gap-4 bg-paper text-ink px-10 py-6 rounded-full font-display text-xl md:text-3xl hover:bg-vermilion hover:text-paper transition-colors duration-500" data-cursor>
+          <i data-feather="mail" class="w-6 h-6"></i> zingor@zmola.eu
+        </a>
+        <button id="copy-email" class="magnetic inline-flex items-center gap-3 border border-paper/30 px-8 py-6 rounded-full text-sm uppercase tracking-[0.15em] hover:border-vermilion hover:text-vermilion transition-colors" data-cursor>
+          <i data-feather="copy" class="w-4 h-4"></i> <span id="copy-label">Kopírovat</span>
+        </button>
+      </div>
+
+      <p class="reveal mt-10 text-paper/40 text-sm">Odpovídáme zpravidla do 24 hodin. Těšíme se na vás.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- ══════════ FOOTER ══════════ -->
+<footer class="bg-ink text-paper border-t border-paper/10">
+  <div class="max-w-[1400px] mx-auto px-5 md:px-10 py-10 flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-3">
+      <svg class="w-7 h-7 spin-slow" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="48.5" fill="#f2eee3"/>
+        <path d="M50 1.5 a48.5 48.5 0 0 1 0 97 a24.25 24.25 0 0 1 0-48.5 a24.25 24.25 0 0 0 0-48.5z" fill="#17140e"/>
+        <circle cx="50" cy="25.75" r="7" fill="#f2eee3"/>
+        <circle cx="50" cy="74.25" r="7" fill="#17140e"/>
+      </svg>
+      <span class="font-display text-lg">Naše <span class="italic font-light">Tai-Chi</span></span>
+    </div>
+    <p class="text-paper/40 text-xs tracking-[0.2em] uppercase">© <span id="year"></span> Naše Tai-Chi · Dům sportu, Merhautova · Brno</p>
+    <a href="mailto:zingor@zmola.eu" class="link-line text-paper/70 hover:text-paper transition-colors" data-cursor>zingor@zmola.eu</a>
+  </div>
+</footer>
+
+<script>
+/* ═════════════ SETUP ═════════════ */
+feather.replace();
+gsap.registerPlugin(ScrollTrigger);
+document.getElementById('year').textContent = new Date().getFullYear();
+
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ═════════════ LENIS SMOOTH SCROLL ═════════════ */
+let lenis = null;
+if (!reduceMotion && typeof Lenis !== 'undefined') {
+  lenis = new Lenis({ lerp: 0.09, smoothWheel: true });
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((t) => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+}
+function scrollToTarget(selector) {
+  const target = document.querySelector(selector);
+  if (!target) return;
+  if (lenis) lenis.scrollTo(target, { offset: -70, duration: 1.4 });
+  else target.scrollIntoView({ behavior: 'smooth' });
+}
+document.querySelectorAll('a.nav-anchor[href^="#"]').forEach(a => {
+  a.addEventListener('click', (e) => {
+    e.preventDefault();
+    closeMenu();
+    scrollToTarget(a.getAttribute('href'));
+  });
+});
+
+/* ═════════════ SPLIT HERO TITLE ═════════════ */
+(function splitTitle() {
+  const el = document.querySelector('[data-split]');
+  if (!el) return;
+  const text = el.textContent;
+  el.innerHTML = '';
+  [...text].forEach((ch) => {
+    const wrap = document.createElement('span');
+    wrap.className = 'char-wrap';
+    const inner = document.createElement('span');
+    inner.className = 'split-char inline-block';
+    inner.innerHTML = ch === ' ' ? '&nbsp;' : ch;
+    wrap.appendChild(inner);
+    el.appendChild(wrap);
+  });
+})();
+
+/* ═════════════ PRELOADER + HERO INTRO ═════════════ */
+(function intro() {
+  const tl = gsap.timeline({ defaults: { ease: 'power4.out' } });
+  tl.from('#preloader-text', { yPercent: 120, duration: 0.9, delay: 0.15 })
+    .to('#preloader', { yPercent: -100, duration: 1, ease: 'power4.inOut', delay: 0.7 })
+    .set('#preloader', { display: 'none' })
+    .from('.split-char', { yPercent: 118, duration: 1.15, stagger: 0.05 }, '-=0.55')
+    .from('.hero-el', { y: 50, opacity: 0, duration: 1, stagger: 0.09 }, '-=0.85');
+})();
+
+/* ═════════════ FLOW FIELD CANVAS ═════════════ */
+(function flowField() {
+  if (reduceMotion) return;
+  const canvas = document.getElementById('flow-field');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles = [], raf, t = 0;
+  const mouse = { x: -9999, y: -9999 };
+
+  function resize() {
+    const rect = canvas.getBoundingClientRect();
+    w = canvas.width = rect.width * devicePixelRatio;
+    h = canvas.height = rect.height * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+    w = rect.width; h = rect.height;
+    init();
+  }
+  function init() {
+    const count = Math.min(130, Math.floor((w * h) / 12000));
+    particles = Array.from({ length: count }, () => spawn());
+    ctx.fillStyle = '#f2eee3';
+    ctx.fillRect(0, 0, w, h);
+  }
+  function spawn() {
+    return {
+      x: Math.random() * w, y: Math.random() * h,
+      px: 0, py: 0,
+      speed: 0.4 + Math.random() * 0.7,
+      col: Math.random() > 0.86 ? 'rgba(194,64,42,0.30)' : 'rgba(23,20,14,0.22)',
+      lw: 0.6 + Math.random() * 0.9
+    };
+  }
+  function tick() {
+    t += 0.0035;
+    ctx.fillStyle = 'rgba(242,238,227,0.055)';
+    ctx.fillRect(0, 0, w, h);
+    for (const p of particles) {
+      p.px = p.x; p.py = p.y;
+      let angle = Math.sin(p.x * 0.0024 + t * 2.2) + Math.cos(p.y * 0.0021 - t * 1.6);
+      const dx = mouse.x - p.x, dy = mouse.y - p.y;
+      const dist = Math.hypot(dx, dy);
+      if (dist < 160) angle += Math.atan2(dy, dx) * 0.14;
+      p.x += Math.cos(angle) * p.speed;
+      p.y += Math.sin(angle) * p.speed;
+      ctx.strokeStyle = p.col;
+      ctx.lineWidth = p.lw;
+      ctx.beginPath();
+      ctx.moveTo(p.px, p.py);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      if (p.x < -20 || p.x > w + 20 || p.y < -20 || p.y > h + 20) {
+        Object.assign(p, spawn());
+        p.px = p.x; p.py = p.y;
+      }
+    }
+    raf = requestAnimationFrame(tick);
+  }
+  canvas.parentElement.addEventListener('mousemove', (e) => {
+    const r = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - r.left;
+    mouse.y = e.clientY - r.top;
+  });
+  canvas.parentElement.addEventListener('mouseleave', () => { mouse.x = -9999; mouse.y = -9999; });
+  window.addEventListener('resize', resize);
+  resize();
+  tick();
+})();
+
+/* ═════════════ CUSTOM CURSOR ═════════════ */
+(function cursor() {
+  if (!window.matchMedia('(pointer: fine)').matches) return;
+  const dot = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mx = -100, my = -100, rx = -100, ry = -100;
+  window.addEventListener('mousemove', (e) => {
+    mx = e.clientX; my = e.clientY;
+    dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%,-50%)`;
+  });
+  (function lerpRing() {
+    rx += (mx - rx) * 0.16;
+    ry += (my - ry) * 0.16;
+    ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%,-50%)`;
+    requestAnimationFrame(lerpRing);
+  })();
+  document.querySelectorAll('a, button, [data-cursor]').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('is-active'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('is-active'));
+  });
+})();
+
+/* ═════════════ MAGNETIC ELEMENTS ═════════════ */
+(function magnetic() {
+  if (!window.matchMedia('(pointer: fine)').matches || reduceMotion) return;
+  document.querySelectorAll('.magnetic').forEach(el => {
+    el.addEventListener('mousemove', (e) => {
+      const r = el.getBoundingClientRect();
+      gsap.to(el, {
+        x: (e.clientX - r.left - r.width / 2) * 0.28,
+        y: (e.clientY - r.top - r.height / 2) * 0.28,
+        duration: 0.4, ease: 'power3.out'
+      });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to(el, { x: 0, y: 0, duration: 0.6, ease: 'elastic.out(1, 0.45)' });
+    });
+  });
+})();
+
+/* ═════════════ SCROLL REVEALS ═════════════ */
+gsap.utils.toArray('.reveal').forEach(el => {
+  gsap.from(el, {
+    y: 48, opacity: 0, duration: 1.05, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%' }
+  });
+});
+gsap.utils.toArray('[data-parallax]').forEach(img => {
+  gsap.fromTo(img, { yPercent: -7 }, {
+    yPercent: 7, ease: 'none',
+    scrollTrigger: { trigger: img.closest('figure') || img, start: 'top bottom', end: 'bottom top', scrub: true }
+  });
+});
+
+/* ═════════════ NAV STATE ═════════════ */
+const nav = document.getElementById('main-nav');
+ScrollTrigger.create({
+  start: 80,
+  onEnter: () => nav.classList.add('nav-scrolled'),
+  onLeaveBack: () => nav.classList.remove('nav-scrolled')
+});
+
+/* ═════════════ MOBILE MENU ═════════════ */
+const overlay = document.getElementById('menu-overlay');
+function openMenu() {
+  overlay.classList.remove('hidden');
+  overlay.classList.add('flex');
+  gsap.from(overlay, { opacity: 0, duration: 0.35 });
+  gsap.from('.menu-link', { y: 44, opacity: 0, stagger: 0.07, duration: 0.7, ease: 'power3.out', delay: 0.1 });
+  if (lenis) lenis.stop();
+}
+function closeMenu() {
+  if (overlay.classList.contains('hidden')) return;
+  gsap.to(overlay, { opacity: 0, duration: 0.3, onComplete: () => {
+    overlay.classList.add('hidden'); overlay.classList.remove('flex');
+    gsap.set(overlay, { clearProps: 'opacity' });
+  }});
+  if (lenis) lenis.start();
+}
+document.getElementById('menu-open').addEventListener('click', openMenu);
+document.getElementById('menu-close').addEventListener('click', closeMenu);
+
+/* ═════════════ BREATHING WIDGET ═════════════ */
+(function breath() {
+  const core = document.getElementById('breath-core');
+  const phaseEl = document.getElementById('breath-phase');
+  const countEl = document.getElementById('breath-count');
+  const btn = document.getElementById('breath-toggle');
+  const label = document.getElementById('breath-btn-label');
+
+  const phases = [
+    { name: 'Nádech', hint: 'nosem · 4 s', dur: 4000, scale: 1.32, bg: '#f2eee3' },
+    { name: 'Zadržte', hint: 'v klidu · 3 s', dur: 3000, scale: 1.32, bg: '#f2eee3' },
+    { name: 'Výdech', hint: 'ústy · 6 s', dur: 6000, scale: 1, bg: '#e9e3d2' },
+    { name: 'Klid', hint: 'odpočinek · 2 s', dur: 2000, scale: 1, bg: '#e9e3d2' }
+  ];
+  let running = false, timer = null, breaths = 0, idx = 0;
+
+  function runPhase() {
+    if (!running) return;
+    const p = phases[idx];
+    core.style.setProperty('--dur', p.dur + 'ms');
+    core.style.transform = `scale(${p.scale})`;
+    core.style.backgroundColor = p.bg;
+    phaseEl.textContent = p.name;
+    countEl.textContent = p.hint;
+    timer = setTimeout(() => {
+      if (idx === phases.length - 1) {
+        breaths++;
+      }
+      idx = (idx + 1) % phases.length;
+      runPhase();
+    }, p.dur);
+  }
+
+  btn.addEventListener('click', () => {
+    running = !running;
+    if (running) {
+      idx = 0;
+      label.textContent = 'Zastavit';
+      btn.querySelector('i, svg')?.replaceWith(Object.assign(document.createElement('i'), { setAttribute: () => {} }) || document.createElement('span'));
+      runPhase();
+      btn.innerHTML = '<i data-feather="square" class="w-4 h-4"></i> <span id="breath-btn-label">Zastavit</span>';
+      feather.replace();
+    } else {
+      clearTimeout(timer);
+      core.style.setProperty('--dur', '900ms');
+      core.style.transform = 'scale(1)';
+      phaseEl.textContent = 'Připraveni?';
+      countEl.textContent = breaths > 0 ? `dokončené cykly: ${breaths}` : 'stiskněte start';
+      btn.innerHTML = '<i data-feather="play" class="w-4 h-4"></i> <span id="breath-btn-label">Začít dýchat</span>';
+      feather.replace();
+    }
+  });
+})();
+
+/* ═════════════ COPY EMAIL ═════════════ */
+(function copyEmail() {
+  const btn = document.getElementById('copy-email');
+  let busy = false;
+  btn.addEventListener('click', async () => {
+    if (busy) return;
+    busy = true;
+    try { await navigator.clipboard.writeText('zingor@zmola.eu'); } catch (e) {}
+    btn.innerHTML = '<i data-feather="check" class="w-4 h-4 text-vermilion"></i> <span>Zkopírováno</span>';
+    feather.replace();
+    setTimeout(() => {
+      btn.innerHTML = '<i data-feather="copy" class="w-4 h-4"></i> <span>Kopírovat</span>';
+      feather.replace();
+      busy = false;
+    }, 2000);
+  });
+})();
+
+/* re-run icon replacement after all dynamic injections */
+feather.replace();
+</script>
+</body>
+</html>
+
